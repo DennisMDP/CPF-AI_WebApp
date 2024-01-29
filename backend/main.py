@@ -1,6 +1,5 @@
 from ImageClassifier import ImageClassifier
 from fastapi import FastAPI
-import requests
 
 
 URL = "http://192.168.0.50/image.bmp"
