@@ -34,7 +34,7 @@ class ImageClassifier:
         img_array = tf.expand_dims(img_array, 0)
         return img_array
     
-    def predict_class(self):
+    def predict_class(self) -> str:
         '''
         Preditct the class of the image using the tflite-model.
         '''
