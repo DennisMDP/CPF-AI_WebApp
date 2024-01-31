@@ -17,9 +17,9 @@ class ImageClassifier:
         Request current image data from web service.
         '''
         response = requests.get(self.url)
-        img = response.content
+        # img = response.content
         # store in variable for comparison and classification
-        self.image = img
+        self.image = response.content
         return
     
     def process_image(self):
@@ -27,6 +27,7 @@ class ImageClassifier:
         Preprocess image data to prepare it for the ML-model.
         '''
         img = Image.open(io.BytesIO(self.image)).convert("RGB")
+        # img = Image.open("test_img.png").convert("RGB")
         # Resize
         img = img.resize((224, 224))
         # Change to array object that contains the rgb values for each pixel
@@ -51,7 +52,7 @@ class ImageClassifier:
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
         # Test the model on random input data.
-        input_shape = input_details[0]['shape']
+        # input_shape = input_details[0]['shape']
         input_data = img_array
         interpreter.set_tensor(input_details[0]['index'], input_data)
         interpreter.invoke()
@@ -59,11 +60,8 @@ class ImageClassifier:
         # The function `get_tensor()` returns a copy of the tensor data.
         # Use `tensor()` in order to get a pointer to the tensor.
         output_data = interpreter.get_tensor(output_details[0]['index'])
-        print(output_data)
+        # print(output_data)
         score = tf.nn.softmax(output_data)
-
-        class_name = class_names[np.argmax(score)]
         
-        return class_name
-    
+        return class_names[np.argmax(score)]
     
