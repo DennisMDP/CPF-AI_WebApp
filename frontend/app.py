@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from PIL import Image
 from time import sleep
+import numpy as np
 
 
 IMAGE_URL = "http://192.168.0.50/image.bmp"
@@ -22,11 +23,10 @@ image_label = st.image(default_img, caption="Default Image", use_column_width=Tr
 # Text label for predicted class
 class_label = st.empty()
 
-def get_class():
-    response = requests.get(ENDPOINT_CLASS).json()
-    class_name = response["class_name"]
-    return class_name
 
+current_img = default_img
+
+    
 def get_image():
     '''
     Request current image data from web service.
@@ -35,26 +35,39 @@ def get_image():
     img = response.content
     return img
 
-def update_gui():
+def are_images_equal(current_img, new_img):
+    '''
+    Get bool value that states if the new image is equal to the current image.
+    '''
+    return np.array_equal(np.array(current_img), np.array(new_img))
+
+def get_class():
+    response = requests.get(ENDPOINT_CLASS).json()
+    class_name = response["class_name"]
+    return class_name
+
+def update_gui(img, img_class):
     '''
     Check web service if there is a new picture.
     If there is a new picture: Predict the class and update GUI with new picture and associated class.
     '''
-    img = get_image()
     image_label.image(img, use_column_width=True)
-    image_class = get_class()
+    
     # update class label
-    class_label.text(f"Klasse: {image_class}")
+    class_label.text(f"Klasse: {img_class}")
     # warning bell if the class is "handyschale_falsch"
-    if image_class == "handyschale_falsch":
+    if img_class == "handyschale_falsch":
         st.balloons()  # Streamlit balloons effect as a substitute for the root.bell()
 
     
 
 def main():
     while True:
-        update_gui()
-        sleep(1)
+        img = get_image()
+        if are_images_equal(current_img=current_img, new_img=img):
+            img_class = get_class()
+            update_gui(img=img, img_class=img_class)
+        sleep(0.3)
 
 
 if __name__ == "__main__":
