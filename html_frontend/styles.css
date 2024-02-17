@@ -1,0 +1,29 @@
+/* CSS-Stilregeln, um alles zu zentrieren und einen Rahmen um den Container zu setzen */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#container {
+    border: 2px solid black; /* Rahmen um den Container */
+    padding: 20px; /* Innenabstand des Containers */
+    border-radius: 8px;
+}
+
+/* CSS-Stilregel, um das Logo-Bild anzupassen */
+#logoImage {
+    width: 200px;
+}
+
+#qualitycamImage {
+    width: 500px;
+}
+
+/* CSS-Stilregeln, um das Label zu zentrieren und die Schriftgröße zu erhöhen */
+#classLabel {
+    text-align: center; /* Zentrieren des Labels */
+    font-size: 30px; /* Erhöhen der Schriftgröße auf 24 Pixel */
+}
