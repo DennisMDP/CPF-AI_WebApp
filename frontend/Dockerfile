@@ -15,5 +15,4 @@ COPY . /app
 EXPOSE 8501
 
 # Start Applikation
-#CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0"]
 CMD ["streamlit", "run", "app.py"]

@@ -8,7 +8,9 @@ import numpy as np
 class ImageClassifier:
     
     def __init__(self):
+        # REST endpoint for cp factory camera image
         self.url = "http://192.168.0.50/image.bmp"
+        # Variable for storing the current image
         self.image = None
     
 
@@ -17,7 +19,6 @@ class ImageClassifier:
         Request current image data from web service.
         '''
         response = requests.get(self.url)
-        # img = response.content
         # store in variable for comparison and classification
         self.image = response.content
         return
@@ -27,7 +28,6 @@ class ImageClassifier:
         Preprocess image data to prepare it for the ML-model.
         '''
         img = Image.open(io.BytesIO(self.image)).convert("RGB")
-        # img = Image.open("test_img.png").convert("RGB")
         # Resize
         img = img.resize((224, 224))
         # Change to array object that contains the rgb values for each pixel
@@ -35,7 +35,7 @@ class ImageClassifier:
         img_array = tf.expand_dims(img_array, 0)
         return img_array
     
-    def predict_class(self) -> str:
+    def predict_class(self, probability: bool) -> str:
         '''
         Preditct the class of the image using the tflite-model.
         '''
@@ -51,17 +51,26 @@ class ImageClassifier:
         # Get input and output tensors.
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
-        # Test the model on random input data.
-        # input_shape = input_details[0]['shape']
         input_data = img_array
         interpreter.set_tensor(input_details[0]['index'], input_data)
         interpreter.invoke()
 
         # The function `get_tensor()` returns a copy of the tensor data.
-        # Use `tensor()` in order to get a pointer to the tensor.
         output_data = interpreter.get_tensor(output_details[0]['index'])
-        # print(output_data)
+        
+        # Get a matrix of the prediction score/probapilities
         score = tf.nn.softmax(output_data)
         
-        return class_names[np.argmax(score)]
+        # Get the index of the class with the highest probability
+        predicted_class_index = np.argmax(score)
+        
+        # If probabili is set to True, return class and probability    
+        if probability:
+            # Get the probability of the predicted class
+            predicted_probability = score[0][predicted_class_index].numpy()
+            return class_names[predicted_class_index], predicted_probability
+        
+        # If probabili is set to False, return only class
+        else:
+            return class_names[predicted_class_index]
     
